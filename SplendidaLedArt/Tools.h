@@ -32,37 +32,42 @@ const uint8_t WokwiBitmap[] PROGMEM = {
   0xf0, 0xf7, 0x8d, 0xf0, 0xfb, 0x23, 0xf0, 0xfa, 0x73, 0xf0, 0xf8, 0xe3, 0xf0, 0xf0, 0xeb, 0xf0,
   0xf0, 0xf3, 0xf0, 0xff, 0xff, 0xf0, 0xff, 0xff, 0xf0, 0xff, 0xff, 0xf0
 };
-void drawWokwiLogo() {
-  uint8_t thisbyte = 0;
-  for (uint8_t j = 0; j < LED_ROWS; j++) {
-    for (uint8_t i = 0; i < LED_COLS; i++) {
-      if (i & 7)
-        thisbyte <<= 1;
-      else
-        thisbyte = pgm_read_byte(&WokwiBitmap[(LED_ROWS - 1 - j) * (27 / 8) + i / 8]);
-      if (thisbyte & 0x80)
-        leds[XY(i, j)] = CRGB::White; else leds[XY(i, j)] = CRGB(0, 0, 0);
+
+struct {
+  uint8_t brightness = START_BRI;
+
+  void drawWokwiLogo() {
+    uint8_t thisbyte = 0;
+    for (uint8_t j = 0; j < LED_ROWS; j++) {
+      for (uint8_t i = 0; i < LED_COLS; i++) {
+        if (i & 7)
+          thisbyte <<= 1;
+        else
+          thisbyte = pgm_read_byte(&WokwiBitmap[(LED_ROWS - 1 - j) * (27 / 8) + i / 8]);
+        if (thisbyte & 0x80)
+          leds[XY(i, j)] = CRGB::White; else leds[XY(i, j)] = CRGB(0, 0, 0);
+      }
     }
   }
-}
-void startupAnimation() {
-  FastLED.clear();
-  drawWokwiLogo();
-  for (uint8_t i = 0; i < 255; i++) {
-    delay(10);
-    FastLED.setBrightness(map(i, 0, 255, 0, START_BRI));
+  void startupAnimation() {
+    FastLED.clear();
+    drawWokwiLogo();
+    for (uint8_t i = 0; i < 255; i++) {
+      delay(5);
+      FastLED.setBrightness(map(i, 0, 255, 0, START_BRI));
+      FastLED.show();
+    }
+    delay(100);
+    for (uint8_t i = 255; i != 0; i--) {
+      delay(5);
+      FastLED.setBrightness(map(i, 0, 255, 0, START_BRI));
+      FastLED.show();
+    }
+    FastLED.clear();
+    FastLED.setBrightness(brightness);
     FastLED.show();
   }
-  delay(100);
-  for (uint8_t i = 255; i != 0; i--) {
-    delay(10);
-    FastLED.setBrightness(map(i, 0, 255, 0, START_BRI));
-    FastLED.show();
-  }
-  FastLED.clear();
-  FastLED.setBrightness(Light.brightness);
-  FastLED.show();
-}
+} Light;
 void drawPixelXYF(float x, float y, CRGB color) {
   if (x < 0 || y < 0 || x > ((float)LED_COLS - 1) || y > ((float)LED_ROWS - 1)) return;
   uint8_t xx = (x - (int) x) * 255, yy = (y - (int) y) * 255, ix = 255 - xx, iy = 255 - yy;

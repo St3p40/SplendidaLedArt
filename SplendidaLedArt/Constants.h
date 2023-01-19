@@ -15,4 +15,4 @@
 #define NUM_LEDS  LED_ROWS * LED_COLS
 #define NUM_REAL_LEDS 257
 // Effects amount
-#define NUM_EFFECTS 6
+#define NUM_EFFECTS 7

@@ -10,10 +10,6 @@ CRGB leds[NUM_REAL_LEDS];
 
 EMFButton btn(BTN_PIN, 0);
 
-struct {
-  uint8_t brightness = START_BRI;
-} Light;
-
 #include "Tools.h"
 #include "Effects.h"
 #include "Button.h"
@@ -25,7 +21,7 @@ void setup() {
     Effect.thisEff = EEPROM.read(1);
     Light.brightness = EEPROM.read(2);
   }
-  startupAnimation();
+  Light.startupAnimation();
   Effect.RePoint();
   Effect.loadFlag = 1;
 }
